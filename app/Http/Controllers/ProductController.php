@@ -219,15 +219,45 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
 
-        if ($product->hinh_anh) {
-        //use Illuminate\Support\Facades\Storage;
+        // if ($product->hinh_anh) {
+        // //use Illuminate\Support\Facades\Storage;
 
-            Storage::disk('public')->delete($product->hinh_anh);
+        //     Storage::disk('public')->delete($product->hinh_anh);
             
-        }
+        // }
         $product->delete();
         return redirect()->route('admin.products.index')
         ->with('success','Xóa sản phẩm thành công');
     }
 
+     // Xóa mềm liên hệ
+ 
+     // Hiển thị danh sách thùng rác
+     public function trash()
+     {
+         $products = Product::onlyTrashed()->paginate(10);
+         return view('admin.products.trash', compact('products'));
+     }
+ 
+     // Khôi phục liên hệ từ thùng rác
+     public function restore($id)
+     {
+         $product = Product::onlyTrashed()->findOrFail($id);
+         $product->restore();
+ 
+         return redirect()->route('admin.products.trash')->with('success', 'Khôi phục thành công!');
+     }
+ 
+     // Xóa vĩnh viễn liên hệ
+     public function forceDelete($id)
+     {
+        $product = Product::onlyTrashed()->findOrFail($id);
+        if ($product->hinh_anh) {
+            Storage::disk('public')->delete($product->hinh_anh);
+        }
+         $product = Product::onlyTrashed()->findOrFail($id);
+         $product->forceDelete();
+ 
+         return redirect()->route('admin.products.trash')->with('success', 'Liên hệ đã bị xóa vĩnh viễn.');
+     }
 }

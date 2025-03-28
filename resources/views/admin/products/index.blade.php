@@ -80,8 +80,10 @@
         </form>
     </div>
 </div>
-
-    <a href="{{ route('admin.products.create') }}" class="btn btn-success">Thêm mới</a>
+    <a href="{{ route('admin.products.create') }}" class="btn btn-success mb-3">Thêm mới</a>
+    <a href="{{ route('admin.products.trash') }}" class="btn btn-secondary mb-3">
+        <i class="fas fa-trash"></i> Thùng rác
+    </a>
     <table class="table table-striped table-bordered">
         <thead class="table-dark">
             <tr>

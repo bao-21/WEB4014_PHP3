@@ -22,6 +22,51 @@ class ContactController extends Controller
         return view('admin.contacts.index', compact('contacts'));
     }
 
+    // Hiển thị form thêm liên hệ
+    public function create()
+    {
+        return view('admin.contacts.create');
+    }
+
+    // Xử lý lưu liên hệ mới
+    public function store(Request $request)
+    {
+        $request->validate([
+            'ten_lien_he' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'so_dien_thoai' => 'required|digits_between:10,11',
+            'tin_nhan' => 'required|string|min:10',
+        ]);
+
+        Contact::create($request->all());
+
+        return redirect()->route('admin.contacts.index')->with('success', 'Thêm liên hệ thành công!');
+    }
+
+    // Hiển thị form sửa liên hệ
+    public function edit($id)
+    {
+        $contact = Contact::findOrFail($id);
+        return view('admin.contacts.edit', compact('contact'));
+    }
+
+    // Xử lý cập nhật liên hệ
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'ten_lien_he' => 'required|string|max:255',
+            'email' => ['required', 'email', 'max:255'],
+            'so_dien_thoai' => 'required|digits_between:10,11',
+            'tin_nhan' => 'required|string|min:10',
+            'trang_thai' => 'required|in:0,1',
+        ]);
+
+        $contact = Contact::findOrFail($id);
+        $contact->update($request->all());
+
+        return redirect()->route('admin.contacts.index')->with('success', 'Cập nhật liên hệ thành công!');
+    }
+    
     // Hiển thị chi tiết liên hệ
     public function show($id)
     {

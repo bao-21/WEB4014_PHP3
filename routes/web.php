@@ -19,10 +19,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/{id}/edit',        [ProductController::class, 'edit'])->name('edit');
         Route::put('/{id}',             [ProductController::class, 'update'])->name('update');
         Route::delete('/{id}/destroy',  [ProductController::class, 'destroy'])->name('destroy');
+
+         // Routes cho thùng rác
+         Route::get('/trash', [ProductController::class, 'trash'])->name('trash');
+         Route::post('/restore/{id}', [ProductController::class, 'restore'])->name('restore');
+         Route::delete('/force-delete/{id}', [ProductController::class, 'forceDelete'])->name('forceDelete');
     });
+
     Route::prefix('contacts')->name('contacts.')->group(function(){
         Route::get('/', [ContactController::class, 'index'])->name('index');
         Route::get('/{id}/show', [ContactController::class, 'show'])->name('show');
+        Route::get('/create', [ContactController::class, 'create'])->name('create');
+        Route::post('/store', [ContactController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [ContactController::class, 'edit'])->name('edit');
+        Route::put('/{id}/update', [ContactController::class, 'update'])->name('update');
         Route::delete('/{id}', [ContactController::class, 'destroy'])->name('destroy');
 
         // Routes cho thùng rác
