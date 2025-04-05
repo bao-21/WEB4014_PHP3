@@ -3,6 +3,7 @@
 @section('title', 'Cập nhật sản phẩm')
 
 @section('content')
+
     <h1 class="mb-4">Cập nhật sản phẩm</h1>
 
     @if ($errors->any())

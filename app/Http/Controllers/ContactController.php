@@ -12,12 +12,26 @@ class ContactController extends Controller
     {
         $query = Contact::query();
 
-        if ($request->filled('search')) {
-            $query->where('ten_lien_he', 'LIKE', '%' . $request->search . '%')
-                  ->orWhere('email', 'LIKE', '%' . $request->search . '%');
+        if ($request->filled('ten_lien_he')) {
+            $query->where('ten_lien_he', 'LIKE', '%' . $request->ten_lien_he . '%');
         }
 
-        $contacts = $query->paginate(10);
+         // Tìm kiếm theo email
+         if ($request->filled('email')) {
+            $query->where('email', 'like', '%' . $request->email . '%');
+        }
+
+        // Lọc theo trạng thái
+        if ($request->filled('trang_thai')) {
+            $query->where('trang_thai', $request->trang_thai);
+        }
+
+        // Lọc theo ngày gửi
+        if ($request->filled('ngay_gui')) {
+            $query->whereDate('created_at', $request->ngay_gui);
+        }
+
+        $contacts = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin.contacts.index', compact('contacts'));
     }
@@ -36,7 +50,18 @@ class ContactController extends Controller
             'email' => 'required|email|max:255',
             'so_dien_thoai' => 'required|digits_between:10,11',
             'tin_nhan' => 'required|string|min:10',
+        ], [
+            'ten_lien_he.required' => 'Vui lòng nhập tên liên hệ.',
+            'ten_lien_he.max' => 'Tên liên hệ không được vượt quá 255 ký tự.',
+            'email.required' => 'Vui lòng nhập email.',
+            'email.email' => 'Email không hợp lệ.',
+            'email.max' => 'Email không được vượt quá 255 ký tự.',
+            'so_dien_thoai.required' => 'Vui lòng nhập số điện thoại.',
+            'so_dien_thoai.digits_between' => 'Số điện thoại phải có từ 10 đến 11 chữ số.',
+            'tin_nhan.required' => 'Vui lòng nhập nội dung tin nhắn.',
+            'tin_nhan.min' => 'Tin nhắn phải có ít nhất 10 ký tự.',
         ]);
+        
 
         Contact::create($request->all());
 
@@ -55,18 +80,30 @@ class ContactController extends Controller
     {
         $request->validate([
             'ten_lien_he' => 'required|string|max:255',
-            'email' => ['required', 'email', 'max:255'],
+            'email' => 'required|email|max:255',
             'so_dien_thoai' => 'required|digits_between:10,11',
             'tin_nhan' => 'required|string|min:10',
             'trang_thai' => 'required|in:0,1',
+        ], [
+            'ten_lien_he.required' => 'Vui lòng nhập tên liên hệ.',
+            'ten_lien_he.max' => 'Tên liên hệ không được vượt quá 255 ký tự.',
+            'email.required' => 'Vui lòng nhập email.',
+            'email.email' => 'Email không hợp lệ.',
+            'email.max' => 'Email không được vượt quá 255 ký tự.',
+            'so_dien_thoai.required' => 'Vui lòng nhập số điện thoại.',
+            'so_dien_thoai.digits_between' => 'Số điện thoại phải có từ 10 đến 11 chữ số.',
+            'tin_nhan.required' => 'Vui lòng nhập nội dung tin nhắn.',
+            'tin_nhan.min' => 'Tin nhắn phải có ít nhất 10 ký tự.',
+            'trang_thai.required' => 'Vui lòng chọn trạng thái.',
+            'trang_thai.in' => 'Trạng thái không hợp lệ.',
         ]);
+        
 
         $contact = Contact::findOrFail($id);
         $contact->update($request->all());
 
         return redirect()->route('admin.contacts.index')->with('success', 'Cập nhật liên hệ thành công!');
     }
-    
     // Hiển thị chi tiết liên hệ
     public function show($id)
     {
