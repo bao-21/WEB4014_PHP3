@@ -9,36 +9,29 @@ use Illuminate\Http\Request;
 
 class RiviewController extends Controller
 {
-    // Danh sách đánh giá (kèm tìm kiếm, phân trang)
     public function index(Request $request)
     {
         $query = Riview::with(['customer', 'product']);
-
         if ($request->has('search')) {
             $query->where('noi_dung', 'like', '%' . $request->search . '%');
         }
-
         $riviews = $query->paginate(10);
         return view('admin.riviews.index', compact('riviews'));
     }
 
-    // Hiển thị chi tiết đánh giá
     public function show($id)
-{
-    $riview = Riview::findOrFail($id);
-    return view('admin.riviews.show', compact('riview'));
-}
-
-
-    // Hiển thị form thêm mới
-    public function create()
     {
-        $customsers = Customser::all(); // Lỗi: sai chính tả "$customsers"
-        $products = Product::all();
-        return view('admin.riviews.create', compact('customsers', 'products'));
+        $riview = Riview::findOrFail($id);
+        return view('admin.riviews.show', compact('riview'));
     }
 
-    // Xử lý lưu đánh giá mới
+    public function create()
+    {
+        $customers = Customser::all(); // Fixed typo
+        $products = Product::all();
+        return view('admin.riviews.create', compact('customers', 'products'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -61,16 +54,15 @@ class RiviewController extends Controller
         return redirect()->route('admin.riviews.index')->with('success', 'Đã thêm đánh giá!');
     }
 
-    // Hiển thị form sửa
-    public function edit(Riview $riview)
+    public function edit(Riview $riview, $id)
     {
-        $customers = Customser::all();
+        $riview = Riview::findOrFail($id);
+        $customers = Customser::all(); // Fixed typo
         $products = Product::all();
         return view('admin.riviews.edit', compact('riview', 'customers', 'products'));
     }
 
-    // Xử lý cập nhật
-    public function update(Request $request, Riview $riview)
+    public function update(Request $request, Riview $riview, $id)
     {
         $request->validate([
             'noi_dung' => 'required|string',
@@ -81,36 +73,34 @@ class RiviewController extends Controller
             'xep_hang.min' => 'Xếp hạng ít nhất là 1.',
             'xep_hang.max' => 'Xếp hạng tối đa là 5.',
         ]);
-
+        $riview = Riview::findOrFail($id);
         $riview->update($request->all());
         return redirect()->route('admin.riviews.index')->with('success', 'Đã cập nhật đánh giá!');
     }
 
-    // Xóa mềm
-    public function destroy(Riview $riview)
+    public function destroy(Riview $riview, $id)
     {
+        $riview = Riview::findOrFail($id);
         $riview->delete();
-        return redirect()->route('riviews.index')->with('success', 'Đã xóa đánh giá!');
+        return redirect()->route('admin.riviews.index')->with('success', 'Đã xóa đánh giá!'); // Fixed route
     }
 
-    // Hiển thị thùng rác
     public function trash()
     {
         $reviews = Riview::onlyTrashed()->paginate(10);
-        return view('admin.riviews.trash', compact('riviews'));
+        return view('admin.riviews.trash', compact('reviews')); // Consistent variable name
     }
 
-    // Khôi phục từ thùng rác
     public function restore($id)
     {
-        Riview::onlyTrashed()->where('id', $id)->restore();
-        return redirect()->route('riviews.trash')->with('success', 'Đã khôi phục đánh giá!');
+        $riview = Riview::onlyTrashed()->findOrFail($id);
+        $riview->restore();
+        return redirect()->route('admin.riviews.trash')->with('success', 'Đã khôi phục đánh giá!');
     }
 
-    // Xóa vĩnh viễn
     public function forceDelete($id)
     {
         Riview::onlyTrashed()->where('id', $id)->forceDelete();
-        return redirect()->route('riviews.trash')->with('success', 'Đã xóa vĩnh viễn đánh giá!');
+        return redirect()->route('admin.riviews.trash')->with('success', 'Đã xóa vĩnh viễn đánh giá!');
     }
 }

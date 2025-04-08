@@ -119,7 +119,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
         Route::get('/create', [RiviewController::class, 'create'])->name('create');
         Route::post('/store', [RiviewController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [RiviewController::class, 'edit'])->name('edit');
-        Route::put('/{id}/update', [RiviewController::class, 'update'])->name('update');
+        Route::put('/update/{id}', [RiviewController::class, 'update'])->name('update');
         Route::delete('/{id}', [RiviewController::class, 'destroy'])->name('destroy');
 
         // Routes cho thùng rác

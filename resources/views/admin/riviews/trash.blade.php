@@ -2,32 +2,35 @@
 
 @section('content')
     <div class="container">
-        <h2>Thùng rác bài viết</h2>
+        <h2>Thùng rác đánh giá</h2>
 
         <table>
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Tiêu đề</th>
-                    <th>Tác giả</th>
-                    <th>Ngày xuất bản</th>
+                    <th>Nội dung</th>
+                    <th>Khách hàng</th>
+                    <th>Sản phẩm</th>
+                    <th>Xếp hạng</th>
                     <th>Hành động</th>
                 </tr>    
             </thead>
             <tbody>
-                @foreach ($posts as $post)
+                @foreach ($reviews as $review)
                     <tr>
-                        <td>{{ $post->id }}</td>
-                        <td>{{ $post->tieu_de }}</td>
-                        <td>{{ $post->tac_gia }}</td>
-                        <td>{{ $post->xuat_ban }}</td>
+                        <td>{{ $review->id }}</td>
+                        <td>{{ Str::limit($review->noi_dung, 50) }}</td> <!-- Limit content for display -->
+                        <td>{{ $review->customer ? $review->customer->name : 'N/A' }}</td>
+                        <td>{{ $review->product ? $review->product->ten_san_pham : 'N/A' }}</td>
+                        <td>{{ $review->xep_hang }} sao</td>
                         <td>
-                            <form action="{{ route('admin.posts.restore', $post->id) }}" method="POST" style="display:inline">
+                            <form action="{{ route('admin.riviews.restore', $review->id) }}" method="POST" style="display:inline">
                                 @csrf
                                 <button type="submit">Khôi phục</button>
                             </form>
-                            <form action="{{ route('admin.posts.forceDelete', $post->id) }}" method="POST" style="display:inline">
-                                @csrf @method('DELETE')
+                            <form action="{{ route('admin.riviews.forceDelete', $review->id) }}" method="POST" style="display:inline">
+                                @csrf
+                                @method('DELETE')
                                 <button type="submit" onclick="return confirm('Bạn có chắc chắn xóa vĩnh viễn?')">Xóa vĩnh viễn</button>
                             </form>
                         </td>
@@ -36,6 +39,6 @@
             </tbody>
         </table>
 
-        {{ $posts->links() }}
+        {{ $reviews->links() }}
     </div>
 @endsection
